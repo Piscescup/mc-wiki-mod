@@ -18,7 +18,7 @@
 			"io.github.piscescup.mcwiki.MinecraftWikiMod"
 		],
 		"client": [
-			"io.github.piscescup.mcwiki.client.MinecraftWikiModClient"
+          "io.github.piscescup.mcwiki.MinecraftWikiModClient"
 		],
 		"fabric-datagen": [
 			"io.github.piscescup.mcwiki.MinecraftWikiModDataGenerator"
