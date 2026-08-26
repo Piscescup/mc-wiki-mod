@@ -3,28 +3,27 @@
 	"id": "mc-wiki",
 	"version": "${version}",
 	"name": "Minecraft Wiki Mod",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"description": "Searches the Minecraft Wiki and shows the results inside an in-game browser screen.",
 	"authors": [
-		"Me!"
+		"REN YuanTong"
 	],
 	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"homepage": "https://minecraft.wiki"
 	},
 	"license": "CC0-1.0",
 	"icon": "assets/mc-wiki/icon.png",
-	"environment": "*",
+	"environment": "client",
 	"entrypoints": {
 		"main": [
 			"io.github.piscescup.mcwiki.MinecraftWikiMod"
+		],
+		"client": [
+			"io.github.piscescup.mcwiki.client.MinecraftWikiModClient"
 		],
 		"fabric-datagen": [
 			"io.github.piscescup.mcwiki.MinecraftWikiModDataGenerator"
 		]
 	},
-	"mixins": [
-		"mc-wiki.mixins.json"
-	],
 	"depends": {
 		"fabricloader": ">=0.19.3",
 		"minecraft": "~26.2",
