@@ -1,5 +1,6 @@
 package io.github.piscescup.mcwiki;
 
+import io.github.piscescup.util.validation.NullCheck;
 import net.minecraft.resources.Identifier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
