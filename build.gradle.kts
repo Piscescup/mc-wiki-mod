@@ -34,9 +34,6 @@ dependencies {
 		"net.dimaskama:mcef-modern:${providers.gradleProperty("mcef_modern_version").get()}"
 	)
 
-	implementation(
-		"io.github.piscescup:commons-lib:${providers.gradleProperty("commons_version").get()}"
-	)
 }
 
 tasks.processResources {

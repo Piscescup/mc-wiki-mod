@@ -10,7 +10,7 @@
 	"contact": {
 		"homepage": "https://minecraft.wiki"
 	},
-	"license": "CC0-1.0",
+	"license": "LGPL-2.1-only",
 	"icon": "assets/mc-wiki/icon.png",
 	"environment": "client",
 	"entrypoints": {
@@ -18,7 +18,7 @@
 			"io.github.piscescup.mcwiki.MinecraftWikiMod"
 		],
 		"client": [
-			"io.github.piscescup.mcwiki.client.MinecraftWikiModClient"
+          "io.github.piscescup.mcwiki.MinecraftWikiModClient"
 		],
 		"fabric-datagen": [
 			"io.github.piscescup.mcwiki.MinecraftWikiModDataGenerator"
