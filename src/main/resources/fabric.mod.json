@@ -10,7 +10,7 @@
 	"contact": {
 		"homepage": "https://minecraft.wiki"
 	},
-	"license": "CC0-1.0",
+	"license": "LGPL-2.1-only",
 	"icon": "assets/mc-wiki/icon.png",
 	"environment": "client",
 	"entrypoints": {
