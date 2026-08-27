@@ -1,10 +1,11 @@
 package io.github.piscescup.mcwiki;
 
-import io.github.piscescup.util.validation.NullCheck;
 import net.minecraft.resources.Identifier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
 
 /**
  * The constants of the {@code Minecraft Wiki} Mod.
@@ -35,7 +36,7 @@ public final class References {
      * @throws NullPointerException if the {@code path} is {@code null}
      */
     public static @NotNull Identifier ofPath(@NotNull String path) {
-        NullCheck.requireNonNull(path);
+        Objects.requireNonNull(path, "path");
 
         return Identifier.fromNamespaceAndPath(MOD_ID, path);
     }

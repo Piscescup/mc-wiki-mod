@@ -1,21 +1,16 @@
 # Minecraft Wiki Mod
 
-`Minecraft Wiki Mod` is a client-side Fabric mod for Minecraft `26.2`.
-It uses `mcef-modern` to open the Minecraft Wiki inside the game.
+Choose a language / 选择语言：
 
-## Commands
+- [English](doc/README_ENUS.md)
+- [简体中文](doc/README_ZHCN.md)
 
-- `/mcwiki <query>`
-- `/wiki <query>`
+Minecraft Wiki Mod is a client-side Fabric mod that searches the Minecraft Wiki and displays articles in an in-game browser.
 
-Both commands open an in-game browser screen and search the Minecraft Wiki for the query you provide.
+Minecraft Wiki Mod 是一个用于搜索 Minecraft Wiki 并在游戏内浏览器中显示条目的客户端 Fabric Mod。
 
-## Notes
+## License / 许可证
 
-- The mod is client-side only.
-- On the first run, `mcef-modern` may download and extract JCEF before the browser is ready.
-- The current search target is `https://zh.minecraft.wiki`.
+This project is licensed under the [GNU LGPL 2.1](LICENSE).
 
-## License
-
-This project currently keeps the template's `CC0-1.0` license file.
+本项目使用 [GNU LGPL 2.1](LICENSE) 许可证。
