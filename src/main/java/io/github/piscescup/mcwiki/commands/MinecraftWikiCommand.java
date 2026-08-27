@@ -3,8 +3,6 @@ package io.github.piscescup.mcwiki.commands;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.suggestion.Suggestions;
-import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.github.piscescup.mcwiki.config.Settings;
 import io.github.piscescup.mcwiki.gui.MinecraftWikiScreen;
@@ -17,11 +15,7 @@ import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.Minecraft;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommands.argument;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommands.literal;
@@ -52,7 +46,11 @@ public final class MinecraftWikiCommand {
 
 		PendingWikiScreen request = pendingScreen;
 		pendingScreen = null;
-		client.gui.setScreen(new MinecraftWikiScreen(request.category(), request.query(), request.language(), request.url()));
+		client.gui.setScreen(
+			new MinecraftWikiScreen(
+				request.category(), request.query(), request.language(), request.url()
+			)
+		);
 	}
 
 	private static LiteralArgumentBuilder<FabricClientCommandSource> createCommand(String name) {
@@ -61,14 +59,14 @@ public final class MinecraftWikiCommand {
 			.executes(MinecraftWikiCommand::sendUsage)
 			.then(MinecraftWikiSettingsCommands.createSettingsCommand())
 			.then(argument("category", StringArgumentType.word())
-				.suggests(MinecraftWikiCommand::suggestCategories)
+				.suggests(WikiCategory::suggestCategories)
 				.then(argument("query", StringArgumentType.greedyString())
 					.executes(MinecraftWikiCommand::openWiki)));
 	}
 
 	private static int sendUsage(CommandContext<FabricClientCommandSource> context) {
 		context.getSource().sendError(WikiTranslations.component(
-			MinecraftWikiSettingsCommands.language(),
+			Settings.currentLang(),
 			"command.mc_wiki.usage"
 		));
 		return 0;
@@ -79,7 +77,7 @@ public final class MinecraftWikiCommand {
 		WikiCategory category = WikiCategory.fromId(categoryId).orElse(null);
 		if (category == null) {
 			context.getSource().sendError(WikiTranslations.component(
-				MinecraftWikiSettingsCommands.language(),
+				Settings.currentLang(),
 				"command.mc_wiki.invalid_category",
 				categoryId
 			));
@@ -91,24 +89,30 @@ public final class MinecraftWikiCommand {
 
 	private static int openWiki(FabricClientCommandSource source, WikiCategory category, String rawQuery) {
 		String query = rawQuery.trim();
+		WikiLanguageConfig language = Settings.currentLang();
+
 		if (query.isEmpty()) {
 			source.sendError(WikiTranslations.component(
-				MinecraftWikiSettingsCommands.language(),
+				language,
 				"command.mc_wiki.usage"
 			));
 			return 0;
 		}
 
-		WikiLanguageConfig language = Settings.currentLang();
 		source.sendFeedback(WikiTranslations.component(
 			language,
 			"command.mc_wiki.searching",
 			query
 		));
-		MediaWikiApiClient.search(language, category, query).whenComplete((result, throwable) -> {
-			Minecraft client = source.getClient();
-			client.execute(() -> completeSearch(source, category, query, language, result, throwable));
-		});
+
+		MediaWikiApiClient
+			.search(language, category, query)
+			.whenComplete((result, throwable) -> {
+				Minecraft client = source.getClient();
+				client.execute(
+					() -> completeSearch(source, category, query, language, result, throwable)
+				);
+			});
 		return 1;
 	}
 
@@ -121,13 +125,11 @@ public final class MinecraftWikiCommand {
 		Throwable throwable
 	) {
 		if (throwable != null) {
-			pendingScreen = new PendingWikiScreen(category, query, language, buildSearchUrl(category, query, language));
 			source.sendError(WikiTranslations.component(language, "command.mc_wiki.api_failed"));
 			return;
 		}
 
 		if (result.isEmpty()) {
-			pendingScreen = new PendingWikiScreen(category, query, language, buildSearchUrl(category, query, language));
 			source.sendFeedback(WikiTranslations.component(language, "command.mc_wiki.no_results"));
 			return;
 		}
@@ -141,20 +143,11 @@ public final class MinecraftWikiCommand {
 		));
 	}
 
-	private static String buildSearchUrl(WikiCategory category, String query, WikiLanguageConfig language) {
-		String searchUrl = "https://" + language.host() + "/w/Special:Search?search=%s";
-		String searchText = category.searchTerm(language) + " " + query;
-		return searchUrl.formatted(URLEncoder.encode(searchText, StandardCharsets.UTF_8));
-	}
-
-	private static CompletableFuture<Suggestions> suggestCategories(
-		CommandContext<FabricClientCommandSource> context,
-		SuggestionsBuilder builder
+	private record PendingWikiScreen(
+		WikiCategory category,
+		String query,
+		WikiLanguageConfig language,
+		String url
 	) {
-		Arrays.stream(WikiCategory.values()).forEach(category -> builder.suggest(category.id()));
-		return builder.buildFuture();
-	}
-
-	private record PendingWikiScreen(WikiCategory category, String query, WikiLanguageConfig language, String url) {
 	}
 }

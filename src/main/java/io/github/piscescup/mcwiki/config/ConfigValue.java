@@ -15,5 +15,6 @@ public interface ConfigValue {
     @NotNull
     String configValue();
 
+    @NotNull
     String configTranslationKey();
 }

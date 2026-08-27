@@ -5,6 +5,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import io.github.piscescup.mcwiki.config.ConfigValue;
 import io.github.piscescup.mcwiki.config.Settings;
 import io.github.piscescup.mcwiki.config.WikiLanguageConfig;
 import io.github.piscescup.mcwiki.wiki.WikiTranslations;
@@ -13,6 +14,7 @@ import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommands.argument;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommands.literal;
@@ -24,51 +26,58 @@ public final class MinecraftWikiSettingsCommands {
 
 	private static final Settings SETTINGS = Settings.getInstance();
 
-	public static final WikiLanguageConfig LANGUAGE = SETTINGS.get(
-		WikiLanguageConfig.LANG_CONF_KEY,
-		WikiLanguageConfig.class,
-		WikiLanguageConfig.EN_US
-	);
-
-	public static final LiteralArgumentBuilder<FabricClientCommandSource> SETTING_ROOT =
-		literal("settings")
-			.requires(FabricClientCommandSource::attended);
-
-	public static final LiteralArgumentBuilder<FabricClientCommandSource> LANG_SETTINGS =
-		buildSettingCommands(
-			"lang",
-			WikiLanguageConfig.LANG_CONF_KEY,
-			"language",
-			WikiLanguageConfig.langSuggestions()
-		);
-
 	private MinecraftWikiSettingsCommands() {}
 
 	public static LiteralArgumentBuilder<FabricClientCommandSource> createSettingsCommand() {
-		return SETTING_ROOT
-			.then(LANG_SETTINGS);
+		return literal("settings")
+			.requires(FabricClientCommandSource::attended)
+			.then(buildSettingCommands(
+				"lang",
+				WikiLanguageConfig.LANG_CONF_KEY,
+				"language",
+				WikiLanguageConfig.langSuggestions(),
+				WikiLanguageConfig.class,
+				WikiLanguageConfig.defaultLanguage(),
+				WikiLanguageConfig::fromId,
+				"command.mc_wiki.invalid_language",
+				"command.mc_wiki.lang_current",
+				"command.mc_wiki.lang_updated"
+			));
 	}
 
-	public static LiteralArgumentBuilder<FabricClientCommandSource> buildSettingCommands(
+	private static <T extends Enum<T> & ConfigValue>
+	LiteralArgumentBuilder<FabricClientCommandSource> buildSettingCommands(
 		String settingCommandName,
 		String configKey,
 		String argName,
-		List<String> suggestions
+		List<String> suggestions,
+		Class<T> valueType,
+		T defaultValue,
+		Function<String, Optional<T>> parser,
+		String invalidTranslationKey,
+		String currentTranslationKey,
+		String updatedTranslationKey
 	) {
 		final var getter = literal(GETTER)
 			.requires(FabricClientCommandSource::attended)
 			.executes( context ->
-				showConfig(context, configKey)
+				showConfig(context, configKey, valueType, defaultValue, currentTranslationKey)
 			);
 
 		final var setter = literal(SETTER)
 			.requires(FabricClientCommandSource::attended)
 			.then(argument(argName, StringArgumentType.word())
 				.suggests((context, builder) ->
-					buildSuggestions(context, builder, suggestions)
+					buildSuggestions(builder, suggestions)
 				)
 				.executes(context ->
-					setConfig(context, configKey, argName)
+					setConfig(
+						context,
+						argName,
+						parser,
+						invalidTranslationKey,
+						updatedTranslationKey
+					)
 				)
 			);
 
@@ -77,29 +86,24 @@ public final class MinecraftWikiSettingsCommands {
 			.then(setter);
 	}
 
-	private static int showConfig(
+	private static <T extends Enum<T> & ConfigValue> int showConfig(
 		CommandContext<FabricClientCommandSource> context,
-		String configKey
+		String configKey,
+		Class<T> valueType,
+		T defaultValue,
+		String translationKey
 	) {
-		Optional<String> config = SETTINGS.get(configKey);
-
-		if (config.isEmpty()) {
-			context.getSource().sendFeedback(WikiTranslations.component(
-				LANGUAGE,
-				"command.mc_wiki.unknown_config"
-			));
-		}
+		T config = SETTINGS.get(configKey, valueType, defaultValue);
 
 		context.getSource().sendFeedback(WikiTranslations.component(
-			LANGUAGE,
-			"command.mc_wiki.current_config",
-			config.get()
+			language(),
+			translationKey,
+			config.configValue()
 		));
 		return 1;
 	}
 
 	private static CompletableFuture<Suggestions> buildSuggestions(
-		CommandContext<FabricClientCommandSource> context,
 		SuggestionsBuilder builder,
 		List<String> suggestions
 	) {
@@ -109,22 +113,36 @@ public final class MinecraftWikiSettingsCommands {
 		return builder.buildFuture();
 	}
 
-	private static int setConfig(
+	private static <T extends ConfigValue> int setConfig(
 		CommandContext<FabricClientCommandSource> context,
-		String configKey,
-		String argName
+		String argName,
+		Function<String, Optional<T>> parser,
+		String invalidTranslationKey,
+		String updatedTranslationKey
 	) {
 		String newValue = StringArgumentType.getString(context, argName);
+		Optional<T> parsedValue = parser.apply(newValue);
+		if (parsedValue.isEmpty()) {
+			context.getSource().sendError(WikiTranslations.component(
+				language(),
+				invalidTranslationKey,
+				newValue
+			));
+			return 0;
+		}
 
-
-		SETTINGS.set(configKey, newValue);
+		T value = parsedValue.get();
+		SETTINGS.set(value);
 		SETTINGS.save();
 		context.getSource().sendFeedback(WikiTranslations.component(
-			LANGUAGE,
-			"command.mc_wiki.config_updated",
-			newValue
+			language(),
+			updatedTranslationKey,
+			value.configValue()
 		));
 		return 1;
 	}
 
+	private static WikiLanguageConfig language() {
+		return Settings.currentLang();
+	}
 }

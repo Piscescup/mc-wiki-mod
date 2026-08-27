@@ -1,27 +1,34 @@
 package io.github.piscescup.mcwiki.wiki;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import io.github.piscescup.mcwiki.config.WikiLanguageConfig;
+import net.fabricmc.fabric.api.resource.v1.ResourceLoader;
+import net.minecraft.client.resources.language.ClientLanguage;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.IllegalFormatException;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
 import static io.github.piscescup.mcwiki.References.MOD_LOGGER;
+import static io.github.piscescup.mcwiki.References.ofPath;
 
 public final class WikiTranslations {
-	private static final Map<WikiLanguageConfig, Map<String, String>> TRANSLATIONS = loadTranslations();
+	private static volatile Map<WikiLanguageConfig, ClientLanguage> translations = Map.of();
 
 	private WikiTranslations() {
+	}
+
+	public static void register() {
+		ResourceLoader.get(PackType.CLIENT_RESOURCES).registerReloadListener(
+			ofPath("wiki_translations"),
+			(ResourceManagerReloadListener) WikiTranslations::reload
+		);
 	}
 
 	public static Component component(WikiLanguageConfig language, String key, Object... arguments) {
@@ -29,10 +36,7 @@ public final class WikiTranslations {
 	}
 
 	public static String text(WikiLanguageConfig language, String key, Object... arguments) {
-		String template = translations(language).get(key);
-		if (template == null) {
-			template = translations(WikiLanguageConfig.EN_US).getOrDefault(key, key);
-		}
+		String template = translation(language, key);
 
 		if (arguments.length == 0) {
 			return template;
@@ -53,35 +57,29 @@ public final class WikiTranslations {
 		return argument instanceof Component component ? component.getString() : argument;
 	}
 
-	private static Map<String, String> translations(WikiLanguageConfig language) {
-		return TRANSLATIONS.getOrDefault(language, Map.of());
+	private static String translation(WikiLanguageConfig language, String key) {
+		ClientLanguage selectedLanguage = translations.get(language);
+		if (selectedLanguage != null && selectedLanguage.has(key)) {
+			return selectedLanguage.getOrDefault(key, key);
+		}
+
+		ClientLanguage fallbackLanguage = translations.get(WikiLanguageConfig.defaultLanguage());
+		return fallbackLanguage == null ? key : fallbackLanguage.getOrDefault(key, key);
 	}
 
-	private static Map<WikiLanguageConfig, Map<String, String>> loadTranslations() {
-		Map<WikiLanguageConfig, Map<String, String>> translations = new EnumMap<>(WikiLanguageConfig.class);
+	private static void reload(ResourceManager resourceManager) {
+		translations = loadTranslations(resourceManager);
+	}
+
+	private static Map<WikiLanguageConfig, ClientLanguage> loadTranslations(ResourceManager resourceManager) {
+		Map<WikiLanguageConfig, ClientLanguage> translations = new EnumMap<>(WikiLanguageConfig.class);
 		for (WikiLanguageConfig language : WikiLanguageConfig.values()) {
-			translations.put(language, loadLanguage(language));
+			translations.put(language, ClientLanguage.loadFrom(
+				resourceManager,
+				List.of(language.configValue()),
+				false
+			));
 		}
 		return Map.copyOf(translations);
-	}
-
-	private static Map<String, String> loadLanguage(WikiLanguageConfig language) {
-		String resourcePath = "assets/mc-wiki/lang/" + language.configValue() + ".json";
-		try (InputStream inputStream = WikiTranslations.class.getClassLoader().getResourceAsStream(resourcePath)) {
-			if (inputStream == null) {
-				MOD_LOGGER.warn("Missing Minecraft Wiki translation resource: {}", resourcePath);
-				return Map.of();
-			}
-
-			JsonObject json = JsonParser.parseReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8)).getAsJsonObject();
-			Map<String, String> languageTranslations = new java.util.HashMap<>();
-			for (Map.Entry<String, JsonElement> entry : json.entrySet()) {
-				languageTranslations.put(entry.getKey(), entry.getValue().getAsString());
-			}
-			return Map.copyOf(languageTranslations);
-		} catch (IOException | RuntimeException exception) {
-			MOD_LOGGER.warn("Failed to load Minecraft Wiki translation resource: {}", resourcePath, exception);
-			return Map.of();
-		}
 	}
 }

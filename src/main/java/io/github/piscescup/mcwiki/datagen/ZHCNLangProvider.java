@@ -17,15 +17,13 @@ public class ZHCNLangProvider extends FabricLanguageProvider {
 		builder.add("command.mc_wiki.usage", "用法: /mc-wiki <category> <query>");
 		builder.add("command.mc_wiki.invalid_category", "未知分类: %s");
 		builder.add("command.mc_wiki.invalid_language", "未知语言: %s");
-		builder.add("command.mc_wiki.opening", "正在打开 Minecraft Wiki: [%s] %s");
 		builder.add("command.mc_wiki.searching", "正在 Minecraft Wiki 中搜索 %s...");
 		builder.add("command.mc_wiki.opening_result", "正在打开 Minecraft Wiki 条目: %s");
-		builder.add("command.mc_wiki.no_results", "未找到直接对应的条目，正在打开搜索结果。");
-		builder.add("command.mc_wiki.api_failed", "MediaWiki API 请求失败，正在打开搜索结果。");
+		builder.add("command.mc_wiki.no_results", "未找到匹配的 Minecraft Wiki 条目。");
+		builder.add("command.mc_wiki.api_failed", "MediaWiki API 请求失败，无法打开 Wiki。");
 		builder.add("command.mc_wiki.lang_current", "当前 Wiki 语言: %s");
 		builder.add("command.mc_wiki.lang_updated", "Wiki 语言已设置为 %s");
 		builder.add("gui.mc_wiki.search", "搜索: %s");
-		builder.add("gui.mc_wiki.category", "分类: %s");
 		builder.add("gui.mc_wiki.footer_hint", "Esc 关闭  鼠标滚轮滚动页面");
 		builder.add("gui.mc_wiki.loading", "正在准备内置浏览器");
 		builder.add("gui.mc_wiki.error", "浏览器初始化失败");
@@ -43,7 +41,7 @@ public class ZHCNLangProvider extends FabricLanguageProvider {
 		builder.add("option.mc_wiki.category.mobs", "生物");
 		builder.add("option.mc_wiki.category.blocks", "方块");
 		builder.add("option.mc_wiki.category.items", "物品");
-		builder.add("option.mc_wiki.category.mob_ecology", "生物群系");
+		builder.add("option.mc_wiki.category.biome", "生物群系");
 		builder.add("option.mc_wiki.category.status_effects", "状态效果");
 		builder.add("option.mc_wiki.category.crafting", "合成");
 		builder.add("option.mc_wiki.category.smelting", "烧炼");

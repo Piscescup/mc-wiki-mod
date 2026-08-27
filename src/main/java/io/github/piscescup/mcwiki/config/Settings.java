@@ -5,8 +5,10 @@ import net.fabricmc.loader.api.FabricLoader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
@@ -20,12 +22,6 @@ public final class Settings {
 		.resolve("mc-wiki-client.properties");
 
 	private static final Settings INSTANCE = load();
-
-	private static final WikiLanguageConfig CURRENT_LANG = INSTANCE.get(
-		WikiLanguageConfig.LANG_CONF_KEY,
-		WikiLanguageConfig.class,
-		WikiLanguageConfig.EN_US
-	);
 
 	private final Properties values;
 
@@ -53,13 +49,14 @@ public final class Settings {
 	) {
 		Objects.requireNonNull(valueType, "valueType");
 		Objects.requireNonNull(defaultValue, "defaultValue");
-		String rawValue = this.values.getProperty(requireKey(key));
+		String checkedKey = requireKey(key);
+		String rawValue = this.values.getProperty(checkedKey);
 		if (rawValue == null) {
 			return defaultValue;
 		}
 
 		for (T candidate : valueType.getEnumConstants()) {
-			if (candidate.configKey().equals(key) && candidate.configValue().equals(rawValue)) {
+			if (candidate.configKey().equals(checkedKey) && candidate.configValue().equals(rawValue)) {
 				return candidate;
 			}
 		}
@@ -80,13 +77,30 @@ public final class Settings {
 	}
 
 	public synchronized void save() {
+		Path temporaryPath = CONFIG_PATH.resolveSibling(CONFIG_PATH.getFileName() + ".tmp");
 		try {
 			Files.createDirectories(CONFIG_PATH.getParent());
-			try (OutputStream outputStream = Files.newOutputStream(CONFIG_PATH)) {
+			try (OutputStream outputStream = Files.newOutputStream(temporaryPath)) {
 				this.values.store(outputStream, "Minecraft Wiki Mod client settings");
+			}
+
+			try {
+				Files.move(
+					temporaryPath,
+					CONFIG_PATH,
+					StandardCopyOption.ATOMIC_MOVE,
+					StandardCopyOption.REPLACE_EXISTING
+				);
+			} catch (AtomicMoveNotSupportedException exception) {
+				Files.move(temporaryPath, CONFIG_PATH, StandardCopyOption.REPLACE_EXISTING);
 			}
 		} catch (IOException exception) {
 			MOD_LOGGER.warn("Failed to save Minecraft Wiki settings to {}", CONFIG_PATH, exception);
+			try {
+				Files.deleteIfExists(temporaryPath);
+			} catch (IOException cleanupException) {
+				MOD_LOGGER.debug("Failed to clean up temporary settings file {}", temporaryPath, cleanupException);
+			}
 		}
 	}
 
@@ -113,6 +127,10 @@ public final class Settings {
 	}
 
 	public static WikiLanguageConfig currentLang() {
-		return CURRENT_LANG;
+		return INSTANCE.get(
+			WikiLanguageConfig.LANG_CONF_KEY,
+			WikiLanguageConfig.class,
+			WikiLanguageConfig.defaultLanguage()
+		);
 	}
 }

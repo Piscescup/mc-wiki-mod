@@ -17,15 +17,13 @@ public class ENUSLangProvider extends FabricLanguageProvider {
 		builder.add("command.mc_wiki.usage", "Usage: /mc-wiki <category> <query>");
 		builder.add("command.mc_wiki.invalid_category", "Unknown category: %s");
 		builder.add("command.mc_wiki.invalid_language", "Unknown language: %s");
-		builder.add("command.mc_wiki.opening", "Opening Minecraft Wiki: [%s] %s");
 		builder.add("command.mc_wiki.searching", "Searching Minecraft Wiki for %s...");
 		builder.add("command.mc_wiki.opening_result", "Opening Minecraft Wiki article: %s");
-		builder.add("command.mc_wiki.no_results", "No direct article found; opening search results.");
-		builder.add("command.mc_wiki.api_failed", "MediaWiki API request failed; opening search results.");
+		builder.add("command.mc_wiki.no_results", "No matching Minecraft Wiki article was found.");
+		builder.add("command.mc_wiki.api_failed", "MediaWiki API request failed; unable to open the wiki.");
 		builder.add("command.mc_wiki.lang_current", "Current wiki language: %s");
 		builder.add("command.mc_wiki.lang_updated", "Wiki language set to %s");
 		builder.add("gui.mc_wiki.search", "Search: %s");
-		builder.add("gui.mc_wiki.category", "Category: %s");
 		builder.add("gui.mc_wiki.footer_hint", "Esc close  Mouse wheel scroll");
 		builder.add("gui.mc_wiki.loading", "Preparing built-in browser");
 		builder.add("gui.mc_wiki.error", "Browser initialization failed");
@@ -43,7 +41,7 @@ public class ENUSLangProvider extends FabricLanguageProvider {
 		builder.add("option.mc_wiki.category.mobs", "Mobs");
 		builder.add("option.mc_wiki.category.blocks", "Blocks");
 		builder.add("option.mc_wiki.category.items", "Items");
-		builder.add("option.mc_wiki.category.mob_ecology", "Mob ecology");
+		builder.add("option.mc_wiki.category.biome", "Biomes");
 		builder.add("option.mc_wiki.category.status_effects", "Status effects");
 		builder.add("option.mc_wiki.category.crafting", "Crafting");
 		builder.add("option.mc_wiki.category.smelting", "Smelting");

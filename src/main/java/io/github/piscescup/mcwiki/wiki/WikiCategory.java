@@ -1,37 +1,39 @@
 package io.github.piscescup.mcwiki.wiki;
 
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.suggestion.Suggestions;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import io.github.piscescup.mcwiki.config.WikiLanguageConfig;
+import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.network.chat.Component;
 
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 public enum WikiCategory {
-	TRADE("trade", "trade", "交易"),
-	BREWING("brewing", "brewing", "酿造"),
-	ENCHANTING("enchanting", "enchanting", "附魔"),
-	MOBS("mobs", "mobs", "生物"),
-	BLOCKS("blocks", "blocks", "方块"),
-	ITEMS("items", "items", "物品"),
-	MOB_ECOLOGY("mob_ecology", "mob ecology", "生物群系"),
-	STATUS_EFFECTS("status_effects", "status effects", "状态效果"),
-	CRAFTING("crafting", "crafting", "合成"),
-	SMELTING("smelting", "smelting", "烧炼"),
-	SMITHING("smithing", "smithing", "锻造"),
-	STRUCTURES("structures", "structures", "结构"),
-	REDSTONE("redstone", "redstone", "红石"),
-	COMMANDS("commands", "commands", "命令"),
-	VERSION_HISTORY("version_history", "version history", "版本记录"),
-	TUTORIALS("tutorials", "tutorials", "教程");
+	TRADE("trade"),
+	BREWING("brewing"),
+	ENCHANTING("enchanting"),
+	MOBS("mobs"),
+	BLOCKS("blocks"),
+	ITEMS("items"),
+	BIOME("biome"),
+	STATUS_EFFECTS("status_effects"),
+	CRAFTING("crafting"),
+	SMELTING("smelting"),
+	SMITHING("smithing"),
+	STRUCTURES("structures"),
+	REDSTONE("redstone"),
+	COMMANDS("commands"),
+	VERSION_HISTORY("version_history"),
+	TUTORIALS("tutorials");
 
 	private final String id;
-	private final String englishSearchTerm;
-	private final String chineseSearchTerm;
 
-	WikiCategory(String id, String englishSearchTerm, String chineseSearchTerm) {
+	WikiCategory(String id) {
 		this.id = id;
-		this.englishSearchTerm = englishSearchTerm;
-		this.chineseSearchTerm = chineseSearchTerm;
 	}
 
 	public String id() {
@@ -39,11 +41,15 @@ public enum WikiCategory {
 	}
 
 	public Component displayName(WikiLanguageConfig language) {
-		return WikiTranslations.component(language, "option.mc_wiki.category." + this.id);
+		return WikiTranslations.component(language, translationKey());
 	}
 
 	public String searchTerm(WikiLanguageConfig language) {
-		return language == WikiLanguageConfig.EN_US ? this.englishSearchTerm : this.chineseSearchTerm;
+		return WikiTranslations.text(language, translationKey());
+	}
+
+	private String translationKey() {
+		return "option.mc_wiki.category." + this.id;
 	}
 
 	public static Optional<WikiCategory> fromId(String id) {
@@ -55,5 +61,15 @@ public enum WikiCategory {
 		}
 
 		return Optional.empty();
+	}
+
+	public static CompletableFuture<Suggestions> suggestCategories(
+		CommandContext<FabricClientCommandSource> context,
+		SuggestionsBuilder builder
+	) {
+		Arrays.stream(WikiCategory.values())
+			.map(WikiCategory::id)
+			.forEach(builder::suggest);
+		return builder.buildFuture();
 	}
 }

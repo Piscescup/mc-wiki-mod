@@ -3,9 +3,7 @@ package io.github.piscescup.mcwiki.config;
 import io.github.piscescup.mcwiki.wiki.WikiTranslations;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
-import org.jspecify.annotations.NonNull;
 
-import java.lang.classfile.PseudoInstruction;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -31,12 +29,12 @@ public enum WikiLanguageConfig implements ConfigValue {
 	}
 
 	@Override
-	public @NonNull String configValue() {
+	public @NotNull String configValue() {
 		return this.id;
 	}
 
 	@Override
-	public String configTranslationKey() {
+	public @NotNull String configTranslationKey() {
 		return "option.mc_wiki.language." + this.id;
 	}
 
