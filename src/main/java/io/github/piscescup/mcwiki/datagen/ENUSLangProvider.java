@@ -33,6 +33,17 @@ public class ENUSLangProvider extends FabricLanguageProvider {
 		builder.add("gui.mc_wiki.progress.install", "Installing browser runtime");
 		builder.add("gui.mc_wiki.progress.initializing", "Starting Chromium");
 		builder.add("gui.mc_wiki.progress.done", "Browser ready");
+		builder.add("config.mc_wiki.title", "Minecraft Wiki Settings");
+		builder.add("config.mc_wiki.heading", "Minecraft Wiki");
+		builder.add("config.mc_wiki.subtitle", "Wiki search, in your language");
+		builder.add("config.mc_wiki.language", "Wiki language");
+		builder.add("config.mc_wiki.language.description", "Controls the Wiki website, interface text, and search results.");
+		builder.add("config.mc_wiki.destination", "Search target:");
+		builder.add("config.mc_wiki.status.saved", "Current settings");
+		builder.add("config.mc_wiki.status.unsaved", "Unsaved preview");
+		builder.add("config.mc_wiki.reset", "Reset");
+		builder.add("config.mc_wiki.cancel", "Cancel");
+		builder.add("config.mc_wiki.save", "Save changes");
 		builder.add("option.mc_wiki.language.en_us", "English (US)");
 		builder.add("option.mc_wiki.language.zh_cn", "Chinese (Simplified)");
 		builder.add("option.mc_wiki.category.trade", "Trade");

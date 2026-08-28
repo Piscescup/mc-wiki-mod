@@ -33,6 +33,17 @@ public class ZHCNLangProvider extends FabricLanguageProvider {
 		builder.add("gui.mc_wiki.progress.install", "正在安装浏览器运行时");
 		builder.add("gui.mc_wiki.progress.initializing", "正在启动 Chromium");
 		builder.add("gui.mc_wiki.progress.done", "浏览器已就绪");
+		builder.add("config.mc_wiki.title", "Minecraft Wiki 设置");
+		builder.add("config.mc_wiki.heading", "Minecraft Wiki");
+		builder.add("config.mc_wiki.subtitle", "用你的语言搜索 Wiki");
+		builder.add("config.mc_wiki.language", "Wiki 语言");
+		builder.add("config.mc_wiki.language.description", "控制 Wiki 网站、界面文字和搜索结果所使用的语言。");
+		builder.add("config.mc_wiki.destination", "搜索站点：");
+		builder.add("config.mc_wiki.status.saved", "当前设置");
+		builder.add("config.mc_wiki.status.unsaved", "未保存的预览");
+		builder.add("config.mc_wiki.reset", "恢复默认");
+		builder.add("config.mc_wiki.cancel", "取消");
+		builder.add("config.mc_wiki.save", "保存更改");
 		builder.add("option.mc_wiki.language.en_us", "英语（美国）");
 		builder.add("option.mc_wiki.language.zh_cn", "简体中文");
 		builder.add("option.mc_wiki.category.trade", "交易");

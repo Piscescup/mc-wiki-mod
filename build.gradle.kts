@@ -9,9 +9,17 @@ repositories {
 	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
 	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
 	// for more information about repositories.
+
+	// MCEF-Modern lib
 	maven {
 		name = "DimasKama"
 		url = uri("https://maven.dimaskama.net/releases")
+	}
+
+	// Mod Menu Support
+	maven {
+		name = "Terraformers"
+		url = uri("https://maven.terraformersmc.com/")
 	}
 
 }
@@ -32,6 +40,10 @@ dependencies {
 
 	implementation(
 		"net.dimaskama:mcef-modern:${providers.gradleProperty("mcef_modern_version").get()}"
+	)
+
+	implementation(
+		"com.terraformersmc:modmenu:${providers.gradleProperty("modmenu_version").get()}"
 	)
 
 }
@@ -61,6 +73,14 @@ java {
 
 tasks.jar {
 	val projectName = project.name
+	val modVersion = project.property("version")
+	val modLoader = project.property("mod_loader")
+	val mcVersion = project.property("minecraft_version")
+
+	archiveFileName.set(
+		"mc-wiki-v$modVersion-$modLoader-mc-$mcVersion.jar"
+	)
+
 	inputs.property("projectName", projectName)
 
 	from("LICENSE") {
