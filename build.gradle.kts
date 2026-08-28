@@ -73,6 +73,14 @@ java {
 
 tasks.jar {
 	val projectName = project.name
+	val modVersion = project.property("version")
+	val modLoader = project.property("mod_loader")
+	val mcVersion = project.property("minecraft_version")
+
+	archiveFileName.set(
+		"mc-wiki-v$modVersion-$modLoader-mc-$mcVersion.jar"
+	)
+
 	inputs.property("projectName", projectName)
 
 	from("LICENSE") {
