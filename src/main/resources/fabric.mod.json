@@ -22,7 +22,26 @@
 		],
 		"fabric-datagen": [
 			"io.github.piscescup.mcwiki.MinecraftWikiModDataGenerator"
+		],
+		"modmenu": [
+			"io.github.piscescup.mcwiki.modmenu.MCWikiModMenuImpl"
 		]
+	},
+	"custom": {
+		"modmenu": {
+			"links": {
+				"modmenu.discord": "https://discord.gg/jEGF5fb"
+			},
+			"badges": [ "library", "deprecated" ],
+			"parent": {
+				"id": "mc-wiki",
+				"name": "Minecraft Wiki",
+				"description": "Searches the Minecraft Wiki and shows the results inside an in-game browser screen.",
+				"icon": "assets/mc-wiki/icon.png",
+				"badges": [ "library" ]
+			},
+			"update_checker": true
+		}
 	},
 	"depends": {
 		"fabricloader": ">=0.19.3",
