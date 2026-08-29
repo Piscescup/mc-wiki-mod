@@ -49,6 +49,18 @@ fabricApi {
 	}
 }
 
+sourceSets.main {
+	resources {
+		exclude(".cache/**")
+
+		// Older nodes already receive generated resources from preprocessResources.
+		val mainProjectName = rootProject.file("versions/mainProject").readText().trim()
+		if (project.name != mainProjectName) {
+			setSrcDirs(srcDirs.filterNot { it == file("src/main/generated") })
+		}
+	}
+}
+
 group = mavenGroup
 version = "v$modVersion-$modLoader-mc-$minecraftVersion"
 base.archivesName.set(archivesBaseName)

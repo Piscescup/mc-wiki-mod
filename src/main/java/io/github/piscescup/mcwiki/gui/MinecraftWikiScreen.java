@@ -240,7 +240,11 @@ public class MinecraftWikiScreen extends Screen {
 
 	@Override
 	public void onClose() {
+		//#if MC >= 260200
 		this.minecraft.gui.setScreen(null);
+		//#else
+		//$$ this.minecraft.setScreen(null);
+		//#endif
 	}
 
 	@Override
