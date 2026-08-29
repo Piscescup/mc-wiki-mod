@@ -25,7 +25,43 @@ preprocess {
 	}
 }
 
+subprojects {
+	tasks.withType<Jar>().configureEach {
+		if (name == "sourcesJar") {
+			tasks.findByName("preprocessResources")?.let {
+				dependsOn(it)
+			}
+		}
+	}
+}
+
 val versionProjects = subprojects.toList()
+
+//tasks.register("buildAndGather") {
+//	group = "build"
+//	description = "Builds every supported Minecraft version and gathers release jars."
+//
+//	versionProjects.forEach { versionProject ->
+//		evaluationDependsOn(versionProject.path)
+//		dependsOn(versionProject.tasks.named("build"))
+//	}
+//
+//	doFirst {
+//		val outputDirectory = layout.buildDirectory.dir("libs").get().asFile
+//		delete(fileTree(outputDirectory) { include("*") })
+//
+//		versionProjects.forEach { versionProject ->
+//			copy {
+//				from(versionProject.layout.buildDirectory.dir("libs")) {
+//					include("*.jar")
+//					exclude("*-dev.jar", "*-sources.jar", "*-shadow.jar")
+//				}
+//				into(outputDirectory)
+//				duplicatesStrategy = DuplicatesStrategy.INCLUDE
+//			}
+//		}
+//	}
+//}
 
 tasks.register("buildAndGather") {
 	group = "build"
@@ -36,16 +72,26 @@ tasks.register("buildAndGather") {
 		dependsOn(versionProject.tasks.named("build"))
 	}
 
-	doFirst {
-		val outputDirectory = layout.buildDirectory.dir("libs").get().asFile
-		delete(fileTree(outputDirectory) { include("*") })
+	doLast {
+		val outputDirectory = layout.buildDirectory
+			.dir("release")
+			.get()
+			.asFile
+
+		delete(outputDirectory)
+		outputDirectory.mkdirs()
 
 		versionProjects.forEach { versionProject ->
 			copy {
 				from(versionProject.layout.buildDirectory.dir("libs")) {
 					include("*.jar")
-					exclude("*-dev.jar", "*-sources.jar", "*-shadow.jar")
+					exclude(
+						"*-dev.jar",
+						"*-sources.jar",
+						"*-shadow.jar"
+					)
 				}
+
 				into(outputDirectory)
 				duplicatesStrategy = DuplicatesStrategy.INCLUDE
 			}
