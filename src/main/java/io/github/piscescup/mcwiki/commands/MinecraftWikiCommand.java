@@ -30,17 +30,17 @@ public final class MinecraftWikiCommand {
 			dispatcher.register(createCommand("mc-wiki"));
 
 		dispatcher.register(literal("mcwiki")
-			.requires(FabricClientCommandSource::attended)
+			.requires(source -> source.getPlayer() != null)
 			.redirect(mcWikiCommand));
 
 		dispatcher.register(literal("wiki")
-			.requires(FabricClientCommandSource::attended)
+			.requires(source -> source.getPlayer() != null)
 			.redirect(mcWikiCommand));
 	}
 
 	private static LiteralArgumentBuilder<FabricClientCommandSource> createCommand(String name) {
 		return literal(name)
-			.requires(FabricClientCommandSource::attended)
+			.requires(source -> source.getPlayer() != null)
 			.executes(MinecraftWikiCommand::sendUsage)
 			.then(MinecraftWikiSettingsCommands.createSettingsCommand())
 			.then(argument("category", StringArgumentType.word())

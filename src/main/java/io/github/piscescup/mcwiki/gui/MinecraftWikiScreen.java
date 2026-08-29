@@ -3,13 +3,21 @@ package io.github.piscescup.mcwiki.gui;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.textures.GpuTextureView;
 import com.mojang.blaze3d.textures.FilterMode;
+//#if MC >= 12111
 import com.mojang.blaze3d.textures.GpuSampler;
+//#endif
 import io.github.piscescup.mcwiki.wiki.WikiCategory;
 import io.github.piscescup.mcwiki.config.WikiLanguageConfig;
 import io.github.piscescup.mcwiki.wiki.WikiTranslations;
 import net.dimaskama.mcef.api.MCEFApi;
 import net.dimaskama.mcef.api.MCEFBrowser;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+//#if MC < 260000
+//$$ import net.minecraft.client.gui.render.TextureSetup;
+//$$ import net.minecraft.client.gui.render.state.BlitRenderState;
+//$$ import net.minecraft.client.renderer.RenderPipelines;
+//$$ import org.joml.Matrix3x2f;
+//#endif
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
@@ -26,7 +34,9 @@ public class MinecraftWikiScreen extends Screen {
 	private static final int ACCENT_COLOR = 0xFF52A535;
 	private static final int ACCENT_DARK_COLOR = 0xFF244D1B;
 	private static final int PANEL_COLOR = 0xF212181A;
+	//#if MC >= 12111
 	private static final GpuSampler BROWSER_SAMPLER = RenderSystem.getSamplerCache().getClampToEdge(FilterMode.LINEAR);
+	//#endif
 
 	private final WikiCategory category;
 	private final String query;
@@ -102,6 +112,7 @@ public class MinecraftWikiScreen extends Screen {
 			return;
 		}
 
+		//#if MC >= 260000
 		graphics.blit(
 			textureView,
 			BROWSER_SAMPLER,
@@ -114,6 +125,27 @@ public class MinecraftWikiScreen extends Screen {
 			0.0F,
 			1.0F
 		);
+		//#else
+		//$$ graphics.guiRenderState.submitGuiElement(new BlitRenderState(
+		//$$ 	RenderPipelines.GUI_TEXTURED,
+		//#if MC >= 12111
+		//$$ 	TextureSetup.singleTexture(textureView, BROWSER_SAMPLER),
+		//#else
+		//$$ 	TextureSetup.singleTexture(textureView),
+		//#endif
+		//$$ 	new Matrix3x2f(graphics.pose()),
+		//$$ 	left,
+		//$$ 	top,
+		//$$ 	right,
+		//$$ 	bottom,
+		//$$ 	0.0F,
+		//$$ 	1.0F,
+		//$$ 	0.0F,
+		//$$ 	1.0F,
+		//$$ 	0xFFFFFFFF,
+		//$$ 	graphics.scissorStack.peek()
+		//$$ ));
+		//#endif
 
 		if (isHoveringBrowser(mouseX, mouseY)) {
 			graphics.requestCursor(this.browser.getCursorType());

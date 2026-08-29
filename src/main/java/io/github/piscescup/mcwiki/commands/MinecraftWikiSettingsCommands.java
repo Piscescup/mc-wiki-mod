@@ -30,7 +30,7 @@ public final class MinecraftWikiSettingsCommands {
 
 	public static LiteralArgumentBuilder<FabricClientCommandSource> createSettingsCommand() {
 		return literal("settings")
-			.requires(FabricClientCommandSource::attended)
+			.requires(source -> source.getPlayer() != null)
 			.then(buildSettingCommands(
 				"lang",
 				WikiLanguageConfig.LANG_CONF_KEY,
@@ -59,13 +59,13 @@ public final class MinecraftWikiSettingsCommands {
 		String updatedTranslationKey
 	) {
 		final var getter = literal(GETTER)
-			.requires(FabricClientCommandSource::attended)
+			.requires(source -> source.getPlayer() != null)
 			.executes( context ->
 				showConfig(context, configKey, valueType, defaultValue, currentTranslationKey)
 			);
 
 		final var setter = literal(SETTER)
-			.requires(FabricClientCommandSource::attended)
+			.requires(source -> source.getPlayer() != null)
 			.then(argument(argName, StringArgumentType.word())
 				.suggests((context, builder) ->
 					buildSuggestions(builder, suggestions)

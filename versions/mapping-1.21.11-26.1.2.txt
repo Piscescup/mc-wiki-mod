@@ -1,0 +1,9 @@
+net.fabricmc.fabric.api.client.command.v2.ClientCommands net.fabricmc.fabric.api.client.command.v2.ClientCommandManager
+net.fabricmc.fabric.api.datagen.v1.FabricPackOutput net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
+net.fabricmc.fabric.api.resource.v1.ResourceLoader registerReloadListener() registerReloader()
+net.minecraft.client.gui.GuiGraphicsExtractor net.minecraft.client.gui.GuiGraphics
+net.minecraft.client.gui.GuiGraphicsExtractor centeredText() drawCenteredString()
+net.minecraft.client.gui.GuiGraphicsExtractor text() drawString()
+net.minecraft.client.gui.GuiGraphicsExtractor textWithWordWrap() drawWordWrap()
+net.minecraft.client.gui.screens.Screen extractRenderState() render()
+net.minecraft.client.gui.screens.Screen extractTransparentBackground() renderTransparentBackground()
