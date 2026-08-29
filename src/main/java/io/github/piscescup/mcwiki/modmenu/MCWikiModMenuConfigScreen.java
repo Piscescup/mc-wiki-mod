@@ -162,7 +162,11 @@ public final class MCWikiModMenuConfigScreen extends Screen {
 
 	@Override
 	public void onClose() {
+		//#if MC >= 260200
 		this.minecraft.gui.setScreen(this.parent);
+		//#else
+		//$$ this.minecraft.setScreen(this.parent);
+		//#endif
 	}
 
 	private void cycleLanguage() {

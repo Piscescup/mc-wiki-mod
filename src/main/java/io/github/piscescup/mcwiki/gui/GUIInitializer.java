@@ -29,7 +29,11 @@ public class GUIInitializer {
 
         PendingWikiScreen request = pendingScreen;
         pendingScreen = null;
+        //#if MC >= 260200
         client.gui.setScreen(
+        //#else
+        //$$ client.setScreen(
+        //#endif
             new MinecraftWikiScreen(
                 request.category(), request.query(), request.language(), request.url()
             )
