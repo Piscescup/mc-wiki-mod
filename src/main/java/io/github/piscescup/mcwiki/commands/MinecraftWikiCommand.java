@@ -11,6 +11,7 @@ import io.github.piscescup.mcwiki.wiki.WikiCategory;
 import io.github.piscescup.mcwiki.wiki.WikiTranslations;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.commands.CommandBuildContext;
+import net.minecraft.commands.Commands;
 
 
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommands.argument;
@@ -30,17 +31,17 @@ public final class MinecraftWikiCommand {
 			dispatcher.register(createCommand("mc-wiki"));
 
 		dispatcher.register(literal("mcwiki")
-			.requires(source -> source.getPlayer() != null)
+			.requires(Commands.hasPermission(Commands.LEVEL_ALL))
 			.redirect(mcWikiCommand));
 
 		dispatcher.register(literal("wiki")
-			.requires(source -> source.getPlayer() != null)
+			.requires(Commands.hasPermission(Commands.LEVEL_ALL))
 			.redirect(mcWikiCommand));
 	}
 
 	private static LiteralArgumentBuilder<FabricClientCommandSource> createCommand(String name) {
 		return literal(name)
-			.requires(source -> source.getPlayer() != null)
+			.requires(Commands.hasPermission(Commands.LEVEL_ALL))
 			.executes(MinecraftWikiCommand::sendUsage)
 			.then(MinecraftWikiSettingsCommands.createSettingsCommand())
 			.then(argument("category", StringArgumentType.word())
